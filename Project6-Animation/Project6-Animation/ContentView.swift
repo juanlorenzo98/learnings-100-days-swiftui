@@ -43,7 +43,7 @@ struct ContentView: View {
     @State private var scoreTitle       = ""
     @State private var scoreMessage     = ""
     @State private var totalScore       = 0
-    @State private var questionCount    = 1
+    @State private var questionCount    = 0
     
     @State private var animationArr             = [false, false, false]
     @State private var rotateAmount: CGFloat    = 0
@@ -64,46 +64,63 @@ struct ContentView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 10) {
-                VStack {
-                    Text("Question #\(questionCount)")
-                    Text("Tap the flag of:")
-                    Text("\(asean[correctAnswer])")
-                        .foregroundStyle(.primary)
-                        .fontWeight(.semibold)
-                        .font(.system(size: 36))
-                }
-                .padding()
-                
-                Spacer()
-                
-                ForEach(0..<3) { index in
-                    Button {
-                        tapped(index)
-                        animationArr[index] = true
-                        withAnimation(.easeOut(duration: 1)) {
-                           rotateAmount = 360
+                if questionCount < 8 {
+                    VStack {
+                        Text("Tap the flag of:")
+                        Text("\(asean[correctAnswer])")
+                            .foregroundStyle(.primary)
+                            .fontWeight(.semibold)
+                            .font(.system(size: 36))
+                    }
+                    .padding()
+                    
+                    Spacer()
+                    
+                    ForEach(0..<3) { index in
+                        Button {
+                            tapped(index)
+                            animationArr[index] = true
+                            withAnimation(.easeOut(duration: 1)) {
+                               rotateAmount = 360
+                            }
+                            
+                            withAnimation(.easeIn(duration: 1)) {
+                                scaleAmount     = 0.5
+                                opacityAmount   = 0.75
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                showScore = true
+                            }
+                            
+                        } label: {
+                                FlagView(
+                                    flag:           asean[index],
+                                    rotateAmount:   animationArr[index] ? rotateAmount : 0,
+                                    opacityAmount:  !animationArr[index] ? opacityAmount : 1,
+                                    scaleAmount:    !animationArr[index] ? scaleAmount : 1
+                                )
                         }
+                    }
+                    
+                    Spacer()
+                } else {
+                    VStack {
+                        Spacer()
+                        Text("Game Over:")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                        Text("Your total score is \(totalScore)")
                         
-                        withAnimation(.easeIn(duration: 1)) {
-                            scaleAmount     = 0.5
-                            opacityAmount   = 0.75
+                        Button {
+                            reset(nthQuestion: 8)
+                        } label: {
+                            Text("Click to restart game")
+                                .padding()
                         }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            showScore = true
-                        }
-                        
-                    } label: {
-                            FlagView(
-                                flag:           asean[index],
-                                rotateAmount:   animationArr[index] ? rotateAmount : 0,
-                                opacityAmount:  !animationArr[index] ? opacityAmount : 1,
-                                scaleAmount:    !animationArr[index] ? scaleAmount : 1
-                            )
+                        Spacer()
                     }
                 }
-                
-                Spacer()
                 
             }
             .frame(maxWidth: .infinity)
@@ -128,8 +145,6 @@ struct ContentView: View {
                 totalScore += 0
                 alertMessage(alertTitle: "Wrong", alertMessage: "Your answer is the flag of \(asean[number])")
             }
-        } else {
-            alertMessage(alertTitle: "Total Score", alertMessage: "Your total score is \(totalScore)")
         }
 
     }
@@ -140,12 +155,7 @@ struct ContentView: View {
     }
     
     func nextQuestion() {
-        if questionCount == 8 {
-            reset(nthQuestion: questionCount)
-        } else {
-            reset(nthQuestion: questionCount)
-        }
-        
+        reset(nthQuestion: questionCount)
     }
 
     func reset(nthQuestion: Int) {
@@ -159,7 +169,7 @@ struct ContentView: View {
         scaleAmount     = 1
         
         if nthQuestion == 8 {
-            questionCount   = 1
+            questionCount   = 0
             totalScore      = 0
         } else {
             questionCount   += 1
