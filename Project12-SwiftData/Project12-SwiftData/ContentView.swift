@@ -8,34 +8,39 @@
 import SwiftUI
 import SwiftData
 
-// Editing SwiftData model objects
 struct ContentView: View {
     @Environment(\.modelContext) var modelContext
-    @Query(sort: \User.name) var users: [User]
-    @State private var path = [User]()
+    @Query(filter: #Predicate<User> { user in
+        user.name.localizedStandardContains("e") &&
+        user.city == "qc"
+    }, sort: \User.name) var users: [User]
+    
     
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack{
             List(users) { user in
-                NavigationLink(value: user) {
-                    Text(user.name)
-                }
+                Text(user.name)
             }
             .navigationTitle("users")
-            .navigationDestination(for: User.self) { user in
-                EditUserView(user: user)
-            }
             .toolbar {
-                Button("add user", systemImage: "plus") {
-                    let user = User(name: "", city: "", joinDate: .now)
-                    modelContext.insert(user)
-                    path = [user]
+                Button("add samples", systemImage: "plus") {
+                    try? modelContext.delete(model: User.self)
+                    
+                    let first = User(name: "enzo", city: "qc", joinDate: .now.addingTimeInterval(86400 * -10))
+                    let second = User(name: "imba", city: "manila", joinDate: .now.addingTimeInterval(86400 * -5))
+                    let third = User(name: "super", city: "pasig", joinDate: .now.addingTimeInterval(86400 * 5))
+                    let fourth = User(name: "easy", city: "pasay", joinDate: .now.addingTimeInterval(86400 * 10))
+                    
+                    modelContext.insert(first)
+                    modelContext.insert(second)
+                    modelContext.insert(third)
+                    modelContext.insert(fourth)
                 }
             }
         }
-
     }
 }
+
 
 #Preview {
     ContentView()
