@@ -10,17 +10,16 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) var modelContext
-    @Query(filter: #Predicate<User> { user in
-        user.name.localizedStandardContains("e") &&
-        user.city == "qc"
-    }, sort: \User.name) var users: [User]
+    @State private var showingUpcomingOnly = false
     
+    @State private var sortOder = [
+        SortDescriptor(\User.name),
+        SortDescriptor(\User.joinDate)
+    ]
     
     var body: some View {
         NavigationStack{
-            List(users) { user in
-                Text(user.name)
-            }
+            UsersView(minimumJoinDate: showingUpcomingOnly ? .now : .distantPast, sortOrder: sortOder)
             .navigationTitle("users")
             .toolbar {
                 Button("add samples", systemImage: "plus") {
@@ -36,6 +35,25 @@ struct ContentView: View {
                     modelContext.insert(third)
                     modelContext.insert(fourth)
                 }
+                
+                Button(showingUpcomingOnly ? "show everyone" : "show upcoming") {
+                    showingUpcomingOnly.toggle()
+                }
+                Menu("sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("sort", selection: $sortOder) {
+                        Text("sort by name")
+                            .tag([
+                                SortDescriptor(\User.name),
+                                SortDescriptor(\User.joinDate)
+                            ])
+                        Text("sort by date")
+                            .tag([
+                                SortDescriptor(\User.joinDate),
+                                SortDescriptor(\User.name)
+                            ])
+                    }
+                }
+                
             }
         }
     }
