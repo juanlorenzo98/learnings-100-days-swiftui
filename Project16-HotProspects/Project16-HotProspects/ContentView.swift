@@ -6,34 +6,19 @@
 //
 
 import SwiftUI
-import UserNotifications
+import SamplePackage
+
 
 struct ContentView: View {
-    
+    let possibleNumbers = 1...60
+    var results: String {
+        let selected = possibleNumbers.random(7).sorted()
+        let strings = selected.map(String.init)
+        return strings.formatted()
+    }
     
     var body: some View {
-        VStack {
-            Button("request permission") {
-                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-                    if success {
-                        print("all set")
-                    } else if let error {
-                        print(error.localizedDescription)
-                    }
-                }
-            }
-            
-            Button("schedule notification") {
-                let content = UNMutableNotificationContent()
-                content.title = "feed the cat"
-                content.subtitle = "it looks hungry"
-                content.sound = UNNotificationSound.default
-                
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-                UNUserNotificationCenter.current().add(request)
-            }
-        }
+        Text(results)
     }
 
 }
