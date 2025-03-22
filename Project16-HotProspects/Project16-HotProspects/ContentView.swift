@@ -6,24 +6,33 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct ContentView: View {
     
     
     var body: some View {
-        List {
-            Text("swift")
-                .swipeActions {
-                    Button("delete", systemImage: "minus.circle", role: .destructive) {
-                        print("delete")
+        VStack {
+            Button("request permission") {
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                    if success {
+                        print("all set")
+                    } else if let error {
+                        print(error.localizedDescription)
                     }
                 }
-                .swipeActions(edge: .leading) {
-                    Button("Pin", systemImage: "pin") {
-                        print("pinning")
-                    }
-                    .tint(.orange)
-                }
+            }
+            
+            Button("schedule notification") {
+                let content = UNMutableNotificationContent()
+                content.title = "feed the cat"
+                content.subtitle = "it looks hungry"
+                content.sound = UNNotificationSound.default
+                
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                UNUserNotificationCenter.current().add(request)
+            }
         }
     }
 
