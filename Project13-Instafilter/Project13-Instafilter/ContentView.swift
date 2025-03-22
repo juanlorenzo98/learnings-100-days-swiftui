@@ -6,24 +6,17 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct ContentView: View {
-
+    @Environment(\.requestReview) var requestReview
     
     var body: some View {
         
-        ShareLink(item: URL(string: "https://www.hackingwithswift.com")!, subject: Text("learn swift here"), message: Text("check ou the 100 days of swiftUI")) {
-            Label("spread the word", systemImage: "swift")
+        Button("leave review") {
+            requestReview()
         }
-        
-//        let example = Image(.example)
-        
-//        ShareLink(item: example)
-        
-//        ShareLink(item: example, preview: SharePreview("", image: example)) {
-//            Label("click to share", systemImage: "swift")
-//        }
-        
+
     }
     
     
