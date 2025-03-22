@@ -8,26 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var bgColor = Color.red
+    
     
     var body: some View {
-        VStack {
-            Text("hello world")
-                .padding()
-                .background(bgColor)
-            
-            Text("change color")
-                .padding()
-                .contextMenu {
-                    Button("red", systemImage: "checkmark.circle.fill", role: .destructive) {
-                        bgColor = .red
+        List {
+            Text("swift")
+                .swipeActions {
+                    Button("delete", systemImage: "minus.circle", role: .destructive) {
+                        print("delete")
                     }
-                    Button("blue") {
-                        bgColor = .blue
+                }
+                .swipeActions(edge: .leading) {
+                    Button("Pin", systemImage: "pin") {
+                        print("pinning")
                     }
-                    Button("green") {
-                        bgColor = .green
-                    }
+                    .tint(.orange)
                 }
         }
     }
