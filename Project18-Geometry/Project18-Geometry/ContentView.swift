@@ -9,9 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text("hello world")
-            .background(.red)
-            .offset(x: 100, y:100)
+        HStack {
+            Text("IMPORTANT")
+                .frame(width: 200)
+                .background(.blue)
+            
+            GeometryReader { proxy in
+                Image("penguin")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: proxy.size.width * 0.8)
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+            }
+            
+        }
+        
             
     }
 }
