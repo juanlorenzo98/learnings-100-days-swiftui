@@ -6,19 +6,30 @@
 //
 
 import SwiftUI
-import SamplePackage
+
 
 
 struct ContentView: View {
-    let possibleNumbers = 1...60
-    var results: String {
-        let selected = possibleNumbers.random(7).sorted()
-        let strings = selected.map(String.init)
-        return strings.formatted()
-    }
     
     var body: some View {
-        Text(results)
+        TabView {
+            ProspectsView(filter: .none)
+                .tabItem {
+                    Label("everyone", systemImage: "person.3")
+                }
+            ProspectsView(filter: .contacted)
+                .tabItem {
+                    Label("contacted", systemImage: "checkmark.circle")
+                }
+            ProspectsView(filter: .uncontacted)
+                .tabItem {
+                    Label("uncontacted", systemImage: "questionmark.diamond")
+                }
+            MeView()
+                .tabItem {
+                    Label("me", systemImage: "person.crop.square")
+                }
+        }
     }
 
 }
