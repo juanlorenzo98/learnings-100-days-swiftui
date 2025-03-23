@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import CodeScanner
 
 struct ProspectsView: View {
     enum FilterType {
@@ -15,6 +16,7 @@ struct ProspectsView: View {
     
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Prospect.name) var prospects: [Prospect]
+    @State private var isShowScanner = false
     
     let filter: FilterType
     
@@ -41,12 +43,15 @@ struct ProspectsView: View {
             .navigationTitle(title)
             .toolbar {
                 Button("Scan", systemImage: "qrcode.viewfinder") {
-                    let prospect = Prospect(
-                        name: "enzo",
-                        emailAddress: "enzo@example.com",
-                        isContacted: false)
-                    modelContext.insert(prospect)
+                    isShowScanner = true
+                    
                 }
+            }
+            .sheet(isPresented: $isShowScanner) {
+                CodeScannerView(
+                    codeTypes: [.qr],
+                    simulatedData: "enzo\nenzo@gmail.com",
+                    completion: handleScan)
             }
         }
     }
@@ -60,6 +65,23 @@ struct ProspectsView: View {
             _prospects = Query(filter: #Predicate {
                 $0.isContacted == showContactedOnly
             }, sort: [SortDescriptor(\Prospect.name)])
+        }
+    }
+    
+    func handleScan(result: Result<ScanResult, ScanError>) {
+        isShowScanner = false
+        
+        switch result {
+        case .success(let result):
+            let details = result.string.components(separatedBy: "\n")
+            guard details.count == 2 else {
+                return
+            }
+            
+            let person = Prospect(name: details[0], emailAddress: details[1], isContacted: false)
+            modelContext.insert(person)
+        case .failure(let error):
+            print("scanning failed \(error.localizedDescription)")
         }
     }
 }
