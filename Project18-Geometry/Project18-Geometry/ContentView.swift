@@ -7,49 +7,56 @@
 
 import SwiftUI
 
-struct OuterView: View {
-    var body: some View {
-        VStack {
-            Text("TOP")
-            
-            InnerView()
-                .background(.green)
-            
-            Text("BOTTOM")
-        }
-    }
-}
-
-struct InnerView: View {
-    var body: some View {
-        HStack {
-            Text("LEFT")
-            
-            GeometryReader { geometry in
-                Text("CENTER")
-                    .background(.blue)
-                    .onTapGesture {
-                        print("GLOBAL CENTER IS \(geometry.frame(in: .global).midX) x \(geometry.frame(in: .global).midY)")
-                        
-                        print("CUSTOM CENTER IS \(geometry.frame(in: .named("Custom")).midX) x \(geometry.frame(in: .named("Custom")).midY)")
-                        
-                        print("LOCAL CENTER IS \(geometry.frame(in: .local).midX) x \(geometry.frame(in: .local).midY)")
-                    }
-            }
-            .background(.orange)
-            
-            Text("RIGHT")
-        }
-    }
-}
-
 struct ContentView: View {
+    
+    
     var body: some View {
-        OuterView()
-            .background(.red)
-            .coordinateSpace(name: "Custom")
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 0) {
+                ForEach(1..<20) { number in
+                    GeometryReader { g in
+                        Text("number \(number)")
+                            .font(.largeTitle)
+                            .padding()
+                            .background(.red)
+                            .rotation3DEffect(.degrees(-g.frame(in: .global).minX / 8), axis: (x: 0, y: 1, z: 0)
+                            )
+                            .frame(width: 200, height: 200)
+                    }
+                    .frame(width: 200, height: 200)
+                }
+            }
+        }
     }
 }
+
+//struct ContentView: View {
+//    let colors: [Color] = [.red, .green, .blue, .orange, .pink, .purple, .yellow]
+//    
+//    var body: some View {
+//        GeometryReader { fullView in
+//            
+//            
+//            ScrollView {
+//                ForEach(0..<50) { index in
+//                    GeometryReader { g in
+//                        Text("row #\(index)")
+//                            .font(.title)
+//                            .frame(maxWidth: .infinity)
+//                            .background(colors[index % 7])
+//                            .rotation3DEffect(
+//                                .degrees(
+//                                    (g.frame(in: .global).minY - (fullView.size.height)/2)
+//                                    )/5,
+//                                axis: (x: 0.0, y: 1.0, z: 0.0)
+//                            )
+//                    }
+//                    .frame(height: 40)
+//                }
+//            }
+//        }
+//    }
+//}
 
 #Preview {
     ContentView()
