@@ -7,24 +7,47 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct OuterView: View {
+    var body: some View {
+        VStack {
+            Text("TOP")
+            
+            InnerView()
+                .background(.green)
+            
+            Text("BOTTOM")
+        }
+    }
+}
+
+struct InnerView: View {
     var body: some View {
         HStack {
-            Text("IMPORTANT")
-                .frame(width: 200)
-                .background(.blue)
+            Text("LEFT")
             
-            GeometryReader { proxy in
-                Image("penguin")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: proxy.size.width * 0.8)
-                    .frame(width: proxy.size.width, height: proxy.size.height)
+            GeometryReader { geometry in
+                Text("CENTER")
+                    .background(.blue)
+                    .onTapGesture {
+                        print("GLOBAL CENTER IS \(geometry.frame(in: .global).midX) x \(geometry.frame(in: .global).midY)")
+                        
+                        print("CUSTOM CENTER IS \(geometry.frame(in: .named("Custom")).midX) x \(geometry.frame(in: .named("Custom")).midY)")
+                        
+                        print("LOCAL CENTER IS \(geometry.frame(in: .local).midX) x \(geometry.frame(in: .local).midY)")
+                    }
             }
+            .background(.orange)
             
+            Text("RIGHT")
         }
-        
-            
+    }
+}
+
+struct ContentView: View {
+    var body: some View {
+        OuterView()
+            .background(.red)
+            .coordinateSpace(name: "Custom")
     }
 }
 
